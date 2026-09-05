@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Uploaded/generated videos
+backend/uploads/
+output/
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# YOLO training outputs
+runs/
+backend/python/runs/
+datasets/
+backend/python/datasets/
+
+# YOLO model files
+*.pt
+
+# Environment/secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Build
+dist/
+build/
