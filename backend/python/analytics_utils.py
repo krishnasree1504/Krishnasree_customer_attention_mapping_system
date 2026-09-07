@@ -573,13 +573,13 @@ def generate_insights(
         shelf_name = most_attended_shelf_id.replace("shelf", "Shelf ").replace("_", " ")
 
         insights.append(
-            f"🏆 {shelf_name} achieved the highest Customer Attention Score of {score}% across all store zones."
+            f"{shelf_name} achieved the highest Customer Attention Score of {score}% across all store zones."
         )
         insights.append(
-            f"⏱ Shoppers spent an average dwell time of {m.get('averageDwellSeconds', 0)} seconds at {shelf_name} (Total Dwell: {m.get('totalDwellSeconds', 0)}s)."
+            f"Shoppers spent an average dwell time of {m.get('averageDwellSeconds', 0)} seconds at {shelf_name} (Total Dwell: {m.get('totalDwellSeconds', 0)}s)."
         )
         insights.append(
-            f"📈 {shelf_name} captured {m.get('uniqueVisitorsCount', 0)} unique customer visits with a peak simultaneous occupancy of {m.get('peakOccupancy', 0)} people."
+            f"{shelf_name} captured {m.get('uniqueVisitorsCount', 0)} unique customer visits with a peak simultaneous occupancy of {m.get('peakOccupancy', 0)} people."
         )
 
     # Check for lowest attention shelf
@@ -589,7 +589,7 @@ def generate_insights(
             low_score = attention_scores[lowest_shelf_id]
             low_name = lowest_shelf_id.replace("shelf", "Shelf ").replace("_", " ")
             insights.append(
-                f"⚠️ {low_name} recorded the lowest attention score ({low_score}%), indicating potential visibility or layout friction."
+                f"{low_name} recorded the lowest attention score ({low_score}%), indicating potential visibility or layout friction."
             )
 
     return insights

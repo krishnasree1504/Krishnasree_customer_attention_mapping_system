@@ -42,7 +42,7 @@ export const ReportsPage: React.FC = () => {
   const [reports, setReports] = useState<GeneratedReport[]>([
     {
       id: 'REP-2026-001',
-      title: 'Q1 Store Attention & Merchandising Audit',
+      title: 'Q1 Store Attention & Audit',
       type: 'Executive Overview',
       storeName: 'All Stores (Global)',
       format: 'PDF',
@@ -171,7 +171,7 @@ export const ReportsPage: React.FC = () => {
                 type="text"
                 value={reportTitle}
                 onChange={(e) => setReportTitle(e.target.value)}
-                placeholder="e.g. Weekly Executive Merchandising Brief"
+                placeholder="e.g. Weekly Executive Brief"
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#00E676]"
               />
             </div>
