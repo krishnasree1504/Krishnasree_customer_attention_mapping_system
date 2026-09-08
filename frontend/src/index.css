@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure images, videos, and canvases scale within containers */
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}

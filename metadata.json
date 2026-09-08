@@ -1,0 +1,6 @@
+{
+  "name": "CAM System",
+  "description": "Consumer Attention Mapping System - In-store video computer vision analytics, YOLOv8 customer tracking, MediaPipe gaze estimation, shelf dwell-time analysis, and executive PDF reporting.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
