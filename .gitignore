@@ -23,7 +23,9 @@ backend/python/datasets/
 
 # YOLO model files
 *.pt
-
+!backend/python/models/best.pt
+!backend/python/models/product_model.pt
+!backend/python/models/yolov8n.pt
 # Environment/secrets
 .env
 .env.*
