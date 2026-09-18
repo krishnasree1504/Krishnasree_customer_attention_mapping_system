@@ -659,9 +659,12 @@ def process_video(input_path, json_path, pdf_path, store_capacity=50, conf_thres
                 source=str(processed_input_path),
                 tracker="bytetrack.yaml",
                 persist=True,
-                classes=[0], # Person class
+                classes=[0],
                 conf=conf_thresh,
                 iou=iou_thresh,
+                imgsz=640,
+                vid_stride=5,
+                device="cpu",
                 stream=True,
                 verbose=False
             )
@@ -997,7 +1000,14 @@ def process_video(input_path, json_path, pdf_path, store_capacity=50, conf_thres
                 # Run product model on frame if loaded
                 frame_product_dets = []
                 if product_model is not None and result.orig_img is not None:
-                    prod_res = product_model(result.orig_img, conf=conf_thresh, verbose=False)
+                    prod_res = product_model(
+                        result.orig_img,
+                        conf=conf_thresh,
+                        imgsz=416,
+                        device="cpu",
+                        max_det=50,
+                        verbose=False  
+                    )
                     if prod_res and len(prod_res) > 0 and prod_res[0].boxes is not None:
                         pboxes = prod_res[0].boxes
                         pconfs = pboxes.conf.cpu().tolist() if pboxes.conf is not None else []
