@@ -1021,15 +1021,18 @@ export class Database {
   const id = data.id || `va-${Date.now()}`;
 
   await pool.query(
-    `INSERT INTO video_analyses
-      (id, store_id, camera_id, video_filename, video_path, status, created_at, completed_at)
-     VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-     ON CONFLICT (id) DO UPDATE SET
-       original_filename = EXCLUDED.original_filename,
-       original_video_path = EXCLUDED.original_video_path,
-       store_id = EXCLUDED.store_id,
-       status = EXCLUDED.status,
-       completed_at = CURRENT_TIMESTAMP`,
+  `INSERT INTO video_analyses
+    (id, store_id, camera_id, video_filename, video_path, status,
+     total_people, unique_people, duration_sec)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    ON CONFLICT (id) DO UPDATE SET
+     video_filename = EXCLUDED.video_filename,
+     video_path = EXCLUDED.video_path,
+     camera_id = EXCLUDED.camera_id,
+     status = EXCLUDED.status,
+     total_people = EXCLUDED.total_people,
+     unique_people = EXCLUDED.unique_people,
+     duration_sec = EXCLUDED.duration_sec`,
     [
       id,
       data.storeId || null,
@@ -1037,11 +1040,11 @@ export class Database {
       data.videoFilename,
       data.videoPath || null,
       data.status || 'completed',
-
+      data.totalPeople || 0,
+      data.uniquePeople || 0,
+      data.durationSec || 0,
     ]
   );
-
-  return id;
 }
 
   async saveAnalysisResult(analysisId: string, resultData: any) {
