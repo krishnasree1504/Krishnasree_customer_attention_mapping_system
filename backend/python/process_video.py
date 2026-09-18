@@ -660,10 +660,10 @@ def process_video(input_path, json_path, pdf_path, store_capacity=50, conf_thres
                 tracker="bytetrack.yaml",
                 persist=True,
                 classes=[0],
-                conf=conf_thresh,
-                iou=iou_thresh,
-                imgsz=640,
-                vid_stride=5,
+                conf=0.20,
+                iou=0.45,
+                imgsz=256,
+                vid_stride=20,
                 device="cpu",
                 stream=True,
                 verbose=False
@@ -673,10 +673,15 @@ def process_video(input_path, json_path, pdf_path, store_capacity=50, conf_thres
             diagnostic_sample_indices = set(safe_linspace(1, max(1, total_frames - 2), min(6, total_frames)))
 
             for frame_idx, result in enumerate(results):
+                if frame_idx % 5 == 0:
+                    print(
+                            f"[CAMS] YOLO processed frame {frame_idx}", 
+                            flush=True
+                        )
+                
                 boxes = result.boxes
                 frame_track_ids = []
                 frame_boxes_data = []
-
                 if boxes is not None and len(boxes) > 0:
                     ids = boxes.id.int().cpu().tolist() if boxes.id is not None else []
                     confs = boxes.conf.cpu().tolist() if boxes.conf is not None else []
@@ -999,13 +1004,16 @@ def process_video(input_path, json_path, pdf_path, store_capacity=50, conf_thres
 
                 # Run product model on frame if loaded
                 frame_product_dets = []
-                if product_model is not None and result.orig_img is not None:
+                if (product_model is not None
+                        and result.orig_img is not None
+                        and frame_idx % 5 == 0
+                    ): 
                     prod_res = product_model(
                         result.orig_img,
-                        conf=conf_thresh,
-                        imgsz=416,
+                        conf=0.20,
+                        imgsz=256,
                         device="cpu",
-                        max_det=50,
+                        max_det=20,
                         verbose=False  
                     )
                     if prod_res and len(prod_res) > 0 and prod_res[0].boxes is not None:
