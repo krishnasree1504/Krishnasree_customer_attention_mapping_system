@@ -370,6 +370,8 @@ def process_video(input_path, json_path, pdf_path, store_capacity=50, conf_thres
                     [
                         ffmpeg_path,
                         "-y",
+                        "-nostdin",
+                        "-loglevel", "error",
                         "-i", str(input_path),
                         "-c:v", "libx264",
                         "-preset", "veryfast",
@@ -377,8 +379,10 @@ def process_video(input_path, json_path, pdf_path, store_capacity=50, conf_thres
                         "-an",
                         str(normalized_path)
                     ],
-                    capture_output=True,
-                    text=True
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    timeout=120
                 )
 
                 if ffmpeg_result.returncode == 0 and normalized_path.exists():
