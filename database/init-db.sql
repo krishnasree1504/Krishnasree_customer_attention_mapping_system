@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS stores (
 CREATE TABLE IF NOT EXISTS shelves (
   id VARCHAR(50) PRIMARY KEY,
   name VARCHAR(150) NOT NULL,
+  shelf_name VARCHAR(150),
   shelf_number VARCHAR(50) NOT NULL,
   store_id VARCHAR(50) NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
   store_name VARCHAR(150),
@@ -30,6 +31,8 @@ CREATE TABLE IF NOT EXISTS shelves (
 CREATE TABLE IF NOT EXISTS cameras (
   id VARCHAR(50) PRIMARY KEY,
   name VARCHAR(150) NOT NULL,
+  camera_name VARCHAR(150),
+  camera_id VARCHAR(50),
   camera_code VARCHAR(50) NOT NULL,
   shelf_id VARCHAR(50) REFERENCES shelves(id) ON DELETE SET NULL,
   shelf_name VARCHAR(150),

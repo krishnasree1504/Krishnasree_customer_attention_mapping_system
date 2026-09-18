@@ -1022,7 +1022,7 @@ export class Database {
 
   await pool.query(
     `INSERT INTO video_analyses
-      (id, store_id, original_filename, original_video_path, status, created_at, completed_at)
+      (id, store_id, camera_id, video_filename, video_path, status, created_at, completed_at)
      VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
      ON CONFLICT (id) DO UPDATE SET
        original_filename = EXCLUDED.original_filename,
@@ -1033,9 +1033,11 @@ export class Database {
     [
       id,
       data.storeId || null,
+      data.cameraId || null,
       data.videoFilename,
       data.videoPath || null,
       data.status || 'completed',
+
     ]
   );
 
