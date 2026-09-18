@@ -290,7 +290,7 @@ def draw_annotated_diagnostic_frame(
 
     return annotated
 
-def process_video(input_path, json_path, pdf_path, store_capacity=50, conf_thresh=0.3, iou_thresh=0.45):
+def process_video(input_path, json_path, pdf_path, store_capacity=50, conf_thresh=0.15, iou_thresh=0.45):
     print("======================================================================")
     print("CAMS - DIAGNOSTIC COMPUTER VISION PIPELINE INITIALIZING")
     print(f"Target Video Input: {input_path}")
