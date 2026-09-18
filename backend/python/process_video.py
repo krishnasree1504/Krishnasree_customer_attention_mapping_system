@@ -346,32 +346,112 @@ def process_video(input_path, json_path, pdf_path, store_capacity=50, conf_thres
     height = 1080
     video_opened = False
 
-    if cv2 is not None and video_exists:
+    # ----------------------------------------------------
+    # FFMPEG NORMALIZATION FOR RENDER / OPENCV COMPATIBILITY
+    # ----------------------------------------------------
+    processed_input_path = Path(input_path)
+
+    if video_exists:
         try:
-            cap = cv2.VideoCapture(str(input_path))
+            import shutil
+
+            ffmpeg_path = shutil.which("ffmpeg")
+
+            if ffmpeg_path:
+                normalized_path = (
+                    Path(input_path).parent /
+                    f"{Path(input_path).stem}_normalized.mp4"
+                )
+
+                print("[CAMS] Normalizing uploaded video with FFmpeg...")
+                print(f"[CAMS] FFmpeg: {ffmpeg_path}")
+
+                ffmpeg_result = subprocess.run(
+                    [
+                        ffmpeg_path,
+                        "-y",
+                        "-i", str(input_path),
+                        "-c:v", "libx264",
+                        "-preset", "veryfast",
+                        "-pix_fmt", "yuv420p",
+                        "-an",
+                        str(normalized_path)
+                    ],
+                    capture_output=True,
+                    text=True
+                )
+
+                if ffmpeg_result.returncode == 0 and normalized_path.exists():
+                    processed_input_path = normalized_path
+                    print(
+                        f"[CAMS] Video normalized successfully: "
+                        f"{processed_input_path}"
+                    )
+                else:
+                    print(
+                        "[CAMS WARNING] FFmpeg normalization failed. "
+                        "Using original video."
+                    )
+                    print(ffmpeg_result.stderr[-2000:])
+
+            else:
+                print("[CAMS WARNING] FFmpeg not found. Using original video.")
+
+        except Exception as ffmpeg_err:
+            print(
+                f"[CAMS WARNING] Video normalization error: {ffmpeg_err}"
+            )
+
+    if cv2 is not None and video_exists:
+         try:
+            cap = cv2.VideoCapture(str(processed_input_path))
+
             if cap.isOpened():
                 video_opened = True
-                total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) or 0
-                fps = float(cap.get(cv2.CAP_PROP_FPS)) or 30.0
+
+                total_frames = int(
+                     cap.get(cv2.CAP_PROP_FRAME_COUNT)
+                ) or 0
+
+                fps = float(
+                    cap.get(cv2.CAP_PROP_FPS)
+                ) or 30.0
+
                 if not fps or math.isnan(fps) or fps <= 0:
                     fps = 30.0
-                width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)) or 1920
-                height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)) or 1080
-                processed_video_path = (
-                            output_dir / f"customer_gaze_{job_id}.mp4"
-                        )
 
-                video_writer = None
+                width = int(
+                    cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+                ) or 1920
+
+                height = int(
+                    cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+                ) or 1080
 
                 print(
-                            f"[CAMS] Processed video will be written to: "
-                            f"{processed_video_path}"
-                        )
+                        f"[CAMS] OpenCV successfully opened normalized video: "
+                        f"{processed_input_path}"
+                )
 
-                cap.release()
-        except Exception as cap_err:
-            print(f"[CAMS DIAGNOSTIC ERROR] Video open failure: {cap_err}", file=sys.stderr)
+                print(
+                    f"[CAMS] Frames: {total_frames} | "
+                    f"FPS: {fps} | "
+                    f"Resolution: {width}x{height}"
+                )
 
+            else:
+                print(
+                        "[CAMS ERROR] OpenCV could not open normalized video.",
+                        file=sys.stderr
+                )
+
+            cap.release()
+
+         except Exception as cap_err:
+            print(
+                f"[CAMS DIAGNOSTIC ERROR] Video open failure: {cap_err}",
+                file=sys.stderr
+            )
     print("\n========== STAGE 1: VIDEO VERIFICATION ==========")
     print(f"VIDEO PATH: {input_path}")
     print(f"VIDEO EXISTS: {video_exists}")
@@ -576,7 +656,7 @@ def process_video(input_path, json_path, pdf_path, store_capacity=50, conf_thres
            
         try:
             results = person_model.track(
-                source=str(input_path),
+                source=str(processed_input_path),
                 tracker="bytetrack.yaml",
                 persist=True,
                 classes=[0], # Person class

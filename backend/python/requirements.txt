@@ -1,0 +1,10 @@
+ultralytics
+opencv-python-headless
+mediapipe
+numpy
+pandas
+scikit-learn
+shap
+fastapi
+uvicorn
+reportlab
