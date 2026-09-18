@@ -350,61 +350,57 @@ def process_video(input_path, json_path, pdf_path, store_capacity=50, conf_thres
     # FFMPEG NORMALIZATION FOR RENDER / OPENCV COMPATIBILITY
     # ----------------------------------------------------
     processed_input_path = Path(input_path)
-
-    if video_exists:
+    if cv2 is not None and video_exists:
         try:
-            import shutil
+            cap = cv2.VideoCapture(str(processed_input_path))
 
-            ffmpeg_path = shutil.which("ffmpeg")
+            if cap.isOpened():
+                video_opened = True
 
-            if ffmpeg_path:
-                normalized_path = (
-                    Path(input_path).parent /
-                    f"{Path(input_path).stem}_normalized.mp4"
+                total_frames = int(
+                    cap.get(cv2.CAP_PROP_FRAME_COUNT)
+                ) or 0
+
+                fps = float(
+                    cap.get(cv2.CAP_PROP_FPS)
+                ) or 30.0
+
+                if not fps or math.isnan(fps) or fps <= 0:
+                    fps = 30.0
+
+                width = int(
+                    cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+                ) or 1920
+
+                height = int(
+                    cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+                ) or 1080
+
+                print(
+                    f"[CAMS] OpenCV successfully opened video: "
+                    f"{processed_input_path}"
                 )
 
-                print("[CAMS] Normalizing uploaded video with FFmpeg...")
-                print(f"[CAMS] FFmpeg: {ffmpeg_path}")
-
-                ffmpeg_result = subprocess.run(
-                    [
-                        ffmpeg_path,
-                        "-y",
-                        "-nostdin",
-                        "-loglevel", "error",
-                        "-i", str(input_path),
-                        "-c:v", "libx264",
-                        "-preset", "veryfast",
-                        "-pix_fmt", "yuv420p",
-                        "-an",
-                        str(normalized_path)
-                    ],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.PIPE,
-                    text=True,
-                    timeout=120
+                print(
+                    f"[CAMS] Frames: {total_frames} | "
+                    f"FPS: {fps} | "
+                    f"Resolution: {width}x{height}"
                 )
-
-                if ffmpeg_result.returncode == 0 and normalized_path.exists():
-                    processed_input_path = normalized_path
-                    print(
-                        f"[CAMS] Video normalized successfully: "
-                        f"{processed_input_path}"
-                    )
-                else:
-                    print(
-                        "[CAMS WARNING] FFmpeg normalization failed. "
-                        "Using original video."
-                    )
-                    print(ffmpeg_result.stderr[-2000:])
 
             else:
-                print("[CAMS WARNING] FFmpeg not found. Using original video.")
+                print(
+                    "[CAMS ERROR] OpenCV could not open video.",
+                    file=sys.stderr
+                )
 
-        except Exception as ffmpeg_err:
+            cap.release()
+
+        except Exception as cap_err:
             print(
-                f"[CAMS WARNING] Video normalization error: {ffmpeg_err}"
+                f"[CAMS DIAGNOSTIC ERROR] Video open failure: {cap_err}",
+                file=sys.stderr
             )
+    
 
     if cv2 is not None and video_exists:
          try:

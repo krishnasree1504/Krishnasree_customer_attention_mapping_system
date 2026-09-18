@@ -8,3 +8,4 @@ shap
 fastapi
 uvicorn
 reportlab
+lap>=0.5.12
